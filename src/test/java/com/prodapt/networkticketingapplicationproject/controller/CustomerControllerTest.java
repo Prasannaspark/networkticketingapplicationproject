@@ -22,6 +22,7 @@ import com.prodapt.networkticketingapplicationproject.entities.Priority;
 import com.prodapt.networkticketingapplicationproject.entities.Severity;
 import com.prodapt.networkticketingapplicationproject.entities.Ticket;
 import com.prodapt.networkticketingapplicationproject.entities.UserEntity;
+import com.prodapt.networkticketingapplicationproject.exceptions.TicketNotFoundException;
 import com.prodapt.networkticketingapplicationproject.requestentities.TicketRequest;
 import com.prodapt.networkticketingapplicationproject.requestentities.TicketUpdateRequest;
 import com.prodapt.networkticketingapplicationproject.service.TicketService;
@@ -90,7 +91,7 @@ public class CustomerControllerTest {
     }
 
     @Test
-    void testUpdateTicket() {
+    void testUpdateTicket() throws TicketNotFoundException {
         // Arrange
         when(ticketService.getTicketById(1L)).thenReturn(ticket);
         when(ticketService.updateTicket(any(Ticket.class))).thenReturn(ticket);
@@ -105,7 +106,7 @@ public class CustomerControllerTest {
     }
 
     @Test
-    void testGetTicket() {
+    void testGetTicket() throws TicketNotFoundException {
         // Arrange
         when(ticketService.getTicketById(1L)).thenReturn(ticket);
 
@@ -119,7 +120,7 @@ public class CustomerControllerTest {
     }
 
     @Test
-    void testGetMyTicket() {
+    void testGetMyTicket() throws TicketNotFoundException {
         // Arrange
         when(userEntityService.getUserById(1L)).thenReturn(user);
         when(ticketService.getByUserEntity(user)).thenReturn(tickets);

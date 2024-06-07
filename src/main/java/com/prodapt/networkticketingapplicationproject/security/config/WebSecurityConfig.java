@@ -55,11 +55,12 @@ public class WebSecurityConfig {
 		return new BCryptPasswordEncoder();
 	}
 
-	public final static String[] PUBLIC_REQUEST_MATCHERS = { "/api/auth/**", "/api-docs/**", "/swagger-ui/**","/v3/api-docs/**"};
+	public final static String[] PUBLIC_REQUEST_MATCHERS = { "/api/test/all","/api/auth/**", "/api-docs/**", "/swagger-ui/**","/v3/api-docs/**"};
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.cors(AbstractHttpConfigurer :: disable).csrf(AbstractHttpConfigurer::disable)
+//		http.cors(AbstractHttpConfigurer :: disable).
+		http.csrf(AbstractHttpConfigurer::disable)
 				.authorizeHttpRequests(req -> req.requestMatchers(PUBLIC_REQUEST_MATCHERS).permitAll()
 						.requestMatchers("/api/networkticketingapp/all").permitAll()
 						.requestMatchers("/api/networkticketingapp/senioritsupport").hasRole("SENIOR_ITSUPPORT")
@@ -67,8 +68,12 @@ public class WebSecurityConfig {
 						.requestMatchers("/api/networkticketingapp/admin").hasRole("ADMIN")
 						.requestMatchers("/api/customer/**").hasRole("USER")
 						.requestMatchers("/api/admin/**").hasRole("ADMIN")
-						.requestMatchers("/api/itsupport/**").hasRole("ITSUPPORT")
-						.requestMatchers("/api/senioritsupport/**").hasRole("SENIOR_ITSUPPORT")
+						.requestMatchers("/api/capable/**").hasRole("CAPABLE_ITSUPPORT")
+						.requestMatchers("/api/specialist/**").hasRole("SPECIALIST_ITSUPPORT")
+						.requestMatchers("/api/available/**").hasRole("AVAILABLE_ITSUPPORT")
+						.requestMatchers("/api/test/user").hasRole("USER")
+						//.requestMatchers("/api/test/parent").hasRole("PARENT")
+						.requestMatchers("/api/test/admin").hasRole("ADMIN")
 						)
 				     
 						//.anyRequest().authenticated())    hasAnyRole("USER","PARENT","ADMIN")

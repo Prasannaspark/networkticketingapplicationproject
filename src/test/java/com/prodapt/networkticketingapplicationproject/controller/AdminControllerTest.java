@@ -20,6 +20,8 @@ import org.springframework.http.ResponseEntity;
 import com.prodapt.networkticketingapplicationproject.entities.ERole;
 import com.prodapt.networkticketingapplicationproject.entities.Role;
 import com.prodapt.networkticketingapplicationproject.entities.Ticket;
+import com.prodapt.networkticketingapplicationproject.exceptions.RoleNotFoundException;
+import com.prodapt.networkticketingapplicationproject.exceptions.TicketNotFoundException;
 import com.prodapt.networkticketingapplicationproject.service.RoleService;
 import com.prodapt.networkticketingapplicationproject.service.TicketService;
 import com.prodapt.networkticketingapplicationproject.service.UserEntityService;
@@ -56,7 +58,7 @@ public class AdminControllerTest {
     }
 
     @Test
-    void testUpdateUserRole_Success() {
+    void testUpdateUserRole_Success() throws RoleNotFoundException {
         // Arrange
         when(roleService.findRoleByName(ERole.ROLE_USER)).thenReturn(Optional.of(role));
         when(userService.updaterole(any(Long.class), any(Role.class))).thenReturn("Role Updated Successfully!!!");
@@ -71,7 +73,7 @@ public class AdminControllerTest {
     }
 
     @Test
-    void testGetAllTickets_Success() {
+    void testGetAllTickets_Success() throws TicketNotFoundException {
         // Arrange
         when(ticketService.getAllTickets()).thenReturn(tickets);
 
@@ -85,7 +87,7 @@ public class AdminControllerTest {
     }
 
     @Test
-    void testGetAllTickets_NoTickets() {
+    void testGetAllTickets_NoTickets() throws TicketNotFoundException {
         // Arrange
         when(ticketService.getAllTickets()).thenReturn(Arrays.asList());
 

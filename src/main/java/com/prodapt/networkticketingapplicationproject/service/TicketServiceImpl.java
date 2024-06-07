@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,8 @@ import com.prodapt.networkticketingapplicationproject.entities.Severity;
 import com.prodapt.networkticketingapplicationproject.entities.Status;
 import com.prodapt.networkticketingapplicationproject.entities.Ticket;
 import com.prodapt.networkticketingapplicationproject.entities.UserEntity;
+import com.prodapt.networkticketingapplicationproject.exceptionmessages.QueryMapper;
+import com.prodapt.networkticketingapplicationproject.exceptions.TicketNotFoundException;
 import com.prodapt.networkticketingapplicationproject.repositories.TicketRepository;
 
 @Service
@@ -32,49 +35,52 @@ public class TicketServiceImpl implements TicketService {
 	}
 
 	@Override
-	public Ticket getTicketById(Long ticketId) {
+	public Ticket getTicketById(Long ticketId) throws TicketNotFoundException{
 		Optional<Ticket> t = repo.findById(ticketId);
 		if (t.isPresent()) {
 			return t.get();
 		}
-		return null;
+		else throw new TicketNotFoundException(QueryMapper.TICKETNOTFOUND);
 	}
 
 	@Override
-	public Ticket updateTicket(Ticket ticket) {
+	public Ticket updateTicket(Ticket ticket) throws TicketNotFoundException {
 		Optional<Ticket> t = repo.findById(ticket.getTicketId());
 		if (t.isPresent()) {
 			return repo.save(t.get());
 		}
-		return null;
+		else throw new TicketNotFoundException(QueryMapper.TICKETNOTFOUND);
 	}
 
 	@Override
-	public List<Ticket> getByPriority(Priority priority) {
+	public List<Ticket> getByPriority(Priority priority) throws TicketNotFoundException{
 		List<Ticket> ticketList = repo.findByPriority(priority);
 		return ticketList;
 	}
 
 	@Override
-	public List<Ticket> getBySeverity(Severity severity) {
+	public List<Ticket> getBySeverity(Severity severity) throws TicketNotFoundException{
 		List<Ticket> ticketList = repo.findBySeverity(severity);
-		return ticketList;
+		if(!ticketList.isEmpty()) return ticketList;
+		else throw new TicketNotFoundException(QueryMapper.TICKETNOTFOUND);
 	}
 
 	@Override
-	public List<Ticket> getByUserEntity(UserEntity userEntity) {
+	public List<Ticket> getByUserEntity(UserEntity userEntity) throws TicketNotFoundException{
 		List<Ticket> ticketList = repo.findByUser(userEntity);
-		return ticketList;
+		if(!ticketList.isEmpty()) return ticketList;
+		else throw new TicketNotFoundException(QueryMapper.TICKETNOTFOUND);
 	}
 
 	@Override
-	public List<Ticket> getAllTickets() {
+	public List<Ticket> getAllTickets() throws TicketNotFoundException{
 		List<Ticket> ticketList = repo.findAll();
-		return ticketList;
+		if(!ticketList.isEmpty()) return ticketList;
+		else throw new TicketNotFoundException(QueryMapper.TICKETNOTFOUND);
 	}
 
 	@Override
-	public List<Ticket> getRoutineTickets() {
+	public List<Ticket> getRoutineTickets() throws TicketNotFoundException{
 		List<Ticket> tMP = repo.findByPriority(Priority.MEDIUM);
 		List<Ticket> tCT = repo.findByCustomerTier(CustomerTier.GOLD);
 		List<Ticket> tLP = repo.findByPriority(Priority.LOW);
@@ -88,48 +94,97 @@ public class TicketServiceImpl implements TicketService {
 				unionList.add(ticket);
 			}
 		}
-		return unionList;
+		if(!unionList.isEmpty()) return unionList;
+		else throw new TicketNotFoundException(QueryMapper.TICKETNOTFOUND);
 	}
 
 	@Override
-	public List<Ticket> getMinorTickets() {
+	public List<Ticket> getMinorTickets() throws TicketNotFoundException {
 		List<Ticket> tP = repo.findByPriority(Priority.LOW);
 		List<Ticket> tS = repo.findBySeverity(Severity.LOW);
 		List<Ticket> intersection = new ArrayList<>(tP); // Start with all elements from tP
 		intersection.retainAll(tS);
-		return intersection;
+		if(!intersection.isEmpty()) return intersection;
+		else throw new TicketNotFoundException(QueryMapper.TICKETNOTFOUND);
 	}
 
 	@Override
-	public List<Ticket> getCriticalTickets() {
+	public List<Ticket> getCriticalTickets() throws TicketNotFoundException{
 		List<Ticket> tP = repo.findByPriority(Priority.HIGH);
 		List<Ticket> tS = repo.findBySeverity(Severity.HIGH);
-		List<Ticket> intersection = new ArrayList<>(tP); // Start with all elements from tP
+		List<Ticket> intersection = new ArrayList<Ticket>(tP);
 		intersection.retainAll(tS);
-		return intersection;
-		
-		
+
+		List<Ticket> tCT = repo.findByCustomerTier(CustomerTier.GOLD);
+		List<Ticket> tLP = repo.findByPriority(Priority.MEDIUM);
+		List<Ticket> tCTLP = new ArrayList<>(tLP);
+		tCTLP.retainAll(tCT);
+		List<Ticket> union = new ArrayList<>(intersection);
+		union.addAll(tCTLP);
+		if(!union.isEmpty()) return union;
+		else throw new TicketNotFoundException(QueryMapper.TICKETNOTFOUND);
+
 	}
 
 	@Override
-	public List<Ticket> getUrgentButNotCriticalTickets() {
+	public List<Ticket> getUrgentButNotCriticalTickets() throws TicketNotFoundException{
 		List<Ticket> tP = repo.findByPriority(Priority.HIGH);
 		List<Ticket> tS = repo.findBySeverity(Severity.MEDIUM);
+
 		List<Ticket> intersection = new ArrayList<>(tP); // Start with all elements from tP
 		intersection.retainAll(tS);
-		return intersection;
+
+		List<Ticket> tCT = repo.findByCustomerTier(CustomerTier.GOLD);
+		List<Ticket> tLP = repo.findByPriority(Priority.MEDIUM);
+		List<Ticket> tCTLP = new ArrayList<>(tLP);
+		tCTLP.retainAll(tCT);
+		List<Ticket> union = new ArrayList<>(intersection);
+		union.addAll(tCTLP);
+		if(!union.isEmpty()) return union;
+		else throw new TicketNotFoundException(QueryMapper.TICKETNOTFOUND);
 	}
 
 	@Override
-	public List<Ticket> getNotUrgentButCriticalTickets() {
+	public List<Ticket> getNotUrgentButCriticalTickets() throws TicketNotFoundException{
 		List<Ticket> tP = repo.findByPriority(Priority.LOW);
 		List<Ticket> tS = repo.findBySeverity(Severity.HIGH);
 		List<Ticket> intersection = new ArrayList<>(tP); // Start with all elements from tP
 		intersection.retainAll(tS);
-		return intersection;
+		if(!intersection.isEmpty()) return intersection;
+		else throw new TicketNotFoundException(QueryMapper.TICKETNOTFOUND);
 
 	}
-	
-	
+
+	@Override
+	public List<Ticket> getFourtyEightPlusAgedTickets() throws TicketNotFoundException{
+		LocalDate currentDate = LocalDate.now();
+		LocalDate fortyEightHoursAgo = currentDate.minusDays(2);
+
+		// Assuming there's a method to retrieve all tickets
+		List<Ticket> allTickets = repo.findAll();
+
+		// Filter tickets older than forty-eight hours
+		List<Ticket> agedTickets = allTickets.stream()
+				.filter(ticket -> ticket.getCreationDate().isBefore(fortyEightHoursAgo)).collect(Collectors.toList());
+
+		if(!agedTickets.isEmpty()) return agedTickets;
+		else throw new TicketNotFoundException(QueryMapper.TICKETNOTFOUND);
+	}
+
+	@Override
+	public List<Ticket> getTwentyFourPlusAgedTickets() throws TicketNotFoundException{
+		LocalDate currentDate = LocalDate.now();
+		LocalDate twentyFourHoursAgo = currentDate.minusDays(1);
+
+		// Assuming there's a method to retrieve all tickets
+		List<Ticket> allTickets = getAllTickets();
+
+		// Filter tickets older than forty-eight hours
+		List<Ticket> agedTickets = allTickets.stream()
+				.filter(ticket -> ticket.getCreationDate().isBefore(twentyFourHoursAgo)).collect(Collectors.toList());
+
+		if(!agedTickets.isEmpty()) return agedTickets;
+		else throw new TicketNotFoundException(QueryMapper.TICKETNOTFOUND);
+	}
 
 }

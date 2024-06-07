@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.prodapt.networkticketingapplicationproject.entities.ERole;
 import com.prodapt.networkticketingapplicationproject.entities.Role;
+import com.prodapt.networkticketingapplicationproject.exceptions.RoleNotFoundException;
 import com.prodapt.networkticketingapplicationproject.repositories.RoleRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,7 +38,7 @@ public class RoleServiceImplTest {
     }
 
     @Test
-    void testFindRoleByName() {
+    void testFindRoleByName() throws RoleNotFoundException {
         // Arrange
         when(roleRepository.findByName(ERole.ROLE_USER)).thenReturn(Optional.of(role));
 
@@ -50,7 +51,7 @@ public class RoleServiceImplTest {
     }
 
     @Test
-    void testFindRoleById() {
+    void testFindRoleById() throws RoleNotFoundException {
         // Arrange
         when(roleRepository.findById(1)).thenReturn(Optional.of(role));
 
@@ -63,7 +64,7 @@ public class RoleServiceImplTest {
     }
 
     @Test
-    void testFindRoleByName_NotFound() {
+    void testFindRoleByName_NotFound() throws RoleNotFoundException {
         // Arrange
         when(roleRepository.findByName(any(ERole.class))).thenReturn(Optional.empty());
 
@@ -75,7 +76,7 @@ public class RoleServiceImplTest {
     }
 
     @Test
-    void testFindRoleById_NotFound() {
+    void testFindRoleById_NotFound() throws RoleNotFoundException {
         // Arrange
         when(roleRepository.findById(any(Integer.class))).thenReturn(Optional.empty());
 

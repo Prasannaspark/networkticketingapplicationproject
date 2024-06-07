@@ -22,6 +22,7 @@ import com.prodapt.networkticketingapplicationproject.entities.Severity;
 import com.prodapt.networkticketingapplicationproject.entities.Status;
 import com.prodapt.networkticketingapplicationproject.entities.Ticket;
 import com.prodapt.networkticketingapplicationproject.entities.UserEntity;
+import com.prodapt.networkticketingapplicationproject.exceptions.TicketNotFoundException;
 import com.prodapt.networkticketingapplicationproject.repositories.TicketRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -68,7 +69,7 @@ public class TicketServiceImplTest {
     }
 
     @Test
-    void testGetTicketById_TicketExists() {
+    void testGetTicketById_TicketExists() throws TicketNotFoundException {
         // Arrange
         when(ticketRepository.findById(1L)).thenReturn(Optional.of(ticket));
 
@@ -81,7 +82,7 @@ public class TicketServiceImplTest {
     }
 
     @Test
-    void testGetTicketById_TicketNotExists() {
+    void testGetTicketById_TicketNotExists() throws TicketNotFoundException {
         // Arrange
         when(ticketRepository.findById(1L)).thenReturn(Optional.empty());
 
@@ -93,7 +94,7 @@ public class TicketServiceImplTest {
     }
 
     @Test
-    void testUpdateTicket_TicketExists() {
+    void testUpdateTicket_TicketExists() throws TicketNotFoundException {
         // Arrange
         when(ticketRepository.findById(1L)).thenReturn(Optional.of(ticket));
         when(ticketRepository.save(any(Ticket.class))).thenReturn(ticket);
@@ -107,7 +108,7 @@ public class TicketServiceImplTest {
     }
 
     @Test
-    void testUpdateTicket_TicketNotExists() {
+    void testUpdateTicket_TicketNotExists() throws TicketNotFoundException {
         // Arrange
         when(ticketRepository.findById(1L)).thenReturn(Optional.empty());
 
@@ -119,7 +120,7 @@ public class TicketServiceImplTest {
     }
 
     @Test
-    void testGetByPriority() {
+    void testGetByPriority() throws TicketNotFoundException {
         // Arrange
         List<Ticket> ticketList = new ArrayList<>();
         ticketList.add(ticket);
@@ -135,7 +136,7 @@ public class TicketServiceImplTest {
     }
 
     @Test
-    void testGetBySeverity() {
+    void testGetBySeverity() throws TicketNotFoundException {
         // Arrange
         List<Ticket> ticketList = new ArrayList<>();
         ticketList.add(ticket);
@@ -151,7 +152,7 @@ public class TicketServiceImplTest {
     }
 
     @Test
-    void testGetByUserEntity() {
+    void testGetByUserEntity() throws TicketNotFoundException {
         // Arrange
         List<Ticket> ticketList = new ArrayList<>();
         ticketList.add(ticket);
@@ -167,7 +168,7 @@ public class TicketServiceImplTest {
     }
 
     @Test
-    void testGetAllTickets() {
+    void testGetAllTickets() throws TicketNotFoundException {
         // Arrange
         List<Ticket> ticketList = new ArrayList<>();
         ticketList.add(ticket);
@@ -183,7 +184,7 @@ public class TicketServiceImplTest {
     }
 
     @Test
-    void testGetRoutineTickets() {
+    void testGetRoutineTickets() throws TicketNotFoundException {
         // Arrange
         List<Ticket> mediumPriorityTickets = new ArrayList<>();
         mediumPriorityTickets.add(ticket);
@@ -206,7 +207,7 @@ public class TicketServiceImplTest {
     }
 
     @Test
-    void testGetMinorTickets() {
+    void testGetMinorTickets() throws TicketNotFoundException {
         // Arrange
         List<Ticket> lowPriorityTickets = new ArrayList<>();
         List<Ticket> lowSeverityTickets = new ArrayList<>();
@@ -225,7 +226,7 @@ public class TicketServiceImplTest {
     }
 
     @Test
-    void testGetCriticalTickets() {
+    void testGetCriticalTickets() throws TicketNotFoundException {
         // Arrange
         List<Ticket> highPriorityTickets = new ArrayList<>();
         List<Ticket> highSeverityTickets = new ArrayList<>();
@@ -244,7 +245,7 @@ public class TicketServiceImplTest {
     }
 
     @Test
-    void testGetUrgentButNotCriticalTickets() {
+    void testGetUrgentButNotCriticalTickets() throws TicketNotFoundException {
         // Arrange
         List<Ticket> highPriorityTickets = new ArrayList<>();
         List<Ticket> mediumSeverityTickets = new ArrayList<>();
@@ -263,7 +264,7 @@ public class TicketServiceImplTest {
     }
 
     @Test
-    void testGetNotUrgentButCriticalTickets() {
+    void testGetNotUrgentButCriticalTickets() throws TicketNotFoundException {
         // Arrange
         List<Ticket> lowPriorityTickets = new ArrayList<>();
         List<Ticket> highSeverityTickets = new ArrayList<>();

@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.prodapt.networkticketingapplicationproject.entities.ERole;
 import com.prodapt.networkticketingapplicationproject.entities.UserEntity;
+import com.prodapt.networkticketingapplicationproject.exceptions.RoleNotFoundException;
 import com.prodapt.networkticketingapplicationproject.security.jwt.JwtUtils;
 import com.prodapt.networkticketingapplicationproject.security.payload.request.LoginRequest;
 import com.prodapt.networkticketingapplicationproject.security.payload.request.SignupRequest;
@@ -69,13 +71,13 @@ public class AuthController {
 		String role = userDetails.getAuthorities().stream().findFirst() // Get the first authority
 				.map(item -> item.getAuthority()) // Map it to its authority string
 				.orElse(null);
-
+		
 		return ResponseEntity.ok(
 				new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), role));
 	}
 
 	@PostMapping("/signup")
-	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) throws RoleNotFoundException {
 		loggers.info("User Signin");
 		if (userEntityService.existsByUsername(signUpRequest.getUsername())) {
 			loggers.info("User Name Already Exist");
@@ -93,7 +95,7 @@ public class AuthController {
 		UserEntity user = new UserEntity(signUpRequest.getUsername(), signUpRequest.getEmail(),
 				encoder.encode(signUpRequest.getPassword()));
 		
-        user.setRole(roleService.findRoleById(4).get());
+        user.setRole(roleService.findRoleByName(ERole.ROLE_USER).get());
         userEntityService.addUserEntity(user);
   
         

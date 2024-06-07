@@ -23,5 +23,9 @@ public interface TicketRepository extends CrudRepository<Ticket, Long>{
 	public List<Ticket> findByCustomerTier(CustomerTier customerTier);
 
 	public List<Ticket> findAll();
+	
+//	public List<Ticket> findByCreationDate(LocalDate creationDate);
+//	
+//	public List<Ticket> findByLastUpdated(LocalDate lastUpdated);
 
 }
